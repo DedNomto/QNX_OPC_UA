@@ -257,7 +257,7 @@ static void GlobalDataChangeCallback(UA_Server *server, UA_UInt32 monitoredItemI
 static void AllocateMemory(uint8_t **pbuffer, uint16_t NumberAcceptedParameters) {
     uint8_t *buffer = *pbuffer;
 
-    if (buffer != NULL || NumberAcceptedParameters == 0) {
+    if (!pbuffer || *pbuffer != NULL || NumberAcceptedParameters == 0) {
         return;
     }
 
@@ -490,7 +490,7 @@ static void AddVariableToOpcUaServer(char *buffer) {
         item.itemToMonitor.nodeId = newNodeId;
         item.itemToMonitor.attributeId = UA_ATTRIBUTEID_VALUE;
         item.monitoringMode = UA_MONITORINGMODE_REPORTING;
-        item.requestedParameters.samplingInterval = 1000.0;
+        item.requestedParameters.samplingInterval = 100.0;
         item.requestedParameters.discardOldest = UA_TRUE;
         item.requestedParameters.queueSize = 10;
 
