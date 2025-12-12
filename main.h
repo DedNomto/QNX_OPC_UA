@@ -94,6 +94,23 @@ static bool registration_active = false;
 typedef void*   RTS_HANDLE;
 
 typedef struct {
+    uint8_t *UaBoolean;
+    uint8_t *UaSByte;
+    uint8_t *UaByte;
+    uint8_t *UaInt16;
+    uint8_t *UaUint16;
+    uint8_t *UaInt32;
+    uint8_t *UaUint32;
+    uint8_t *UaInt64;
+    uint8_t *UaUint64;
+    uint8_t *UaFloat;
+    uint8_t *UaDouble;
+    uint8_t *UaString;
+} change_flag_buffer;
+
+change_flag_buffer OpcUaChangeFlagBuffer;
+
+typedef struct {
     message_type_t message_type;
     UA_DataTypeKind typeKind;
     char name[MAX_NAME_LENGTH];
@@ -102,6 +119,7 @@ typedef struct {
     uint8_t value[MAX_DATA_SIZE];
     double deadbandValue;
     uint16_t index;
+    uint16_t NumberAcceptedParameters;
 } variable_registration_t;
 
 typedef struct {

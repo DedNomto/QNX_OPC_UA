@@ -50,6 +50,72 @@ static UA_StatusCode WriteServerVariable(char *buffer) {
     UA_Variant_clear(&currentValue);
     UA_NodeId_clear(&nodeId);
 
+    switch(message->typeKind) {
+        case UA_DATATYPEKIND_BOOLEAN:
+            if (OpcUaChangeFlagBuffer.UaBoolean != NULL) {
+                OpcUaChangeFlagBuffer.UaBoolean[message->index] = 1;
+            }
+            break;
+        case UA_DATATYPEKIND_SBYTE:
+            if (OpcUaChangeFlagBuffer.UaSByte != NULL) {
+                OpcUaChangeFlagBuffer.UaSByte[message->index] = 1;
+            }
+            break;
+        case UA_DATATYPEKIND_BYTE:
+            if (OpcUaChangeFlagBuffer.UaByte != NULL) {
+                OpcUaChangeFlagBuffer.UaByte[message->index] = 1;
+            }
+            break;
+        case UA_DATATYPEKIND_INT16:
+            if (OpcUaChangeFlagBuffer.UaInt16 != NULL) {
+                OpcUaChangeFlagBuffer.UaInt16[message->index] = 1;
+            }
+            break;
+        case UA_DATATYPEKIND_UINT16:
+            if (OpcUaChangeFlagBuffer.UaUint16 != NULL) {
+                OpcUaChangeFlagBuffer.UaUint16[message->index] = 1;
+            }
+            break;
+        case UA_DATATYPEKIND_INT32:
+            if (OpcUaChangeFlagBuffer.UaInt32 != NULL) {
+                OpcUaChangeFlagBuffer.UaInt32[message->index] = 1;
+            }
+            break;
+        case UA_DATATYPEKIND_UINT32:
+            if (OpcUaChangeFlagBuffer.UaUint32 != NULL) {
+                OpcUaChangeFlagBuffer.UaUint32[message->index] = 1;
+            }
+            break;
+        case UA_DATATYPEKIND_INT64:
+            if (OpcUaChangeFlagBuffer.UaInt64 != NULL) {
+                OpcUaChangeFlagBuffer.UaInt64[message->index] = 1;
+            }
+            break;
+        case UA_DATATYPEKIND_UINT64:
+            if (OpcUaChangeFlagBuffer.UaUint64 != NULL) {
+                OpcUaChangeFlagBuffer.UaUint64[message->index] = 1;
+            }
+            break;
+        case UA_DATATYPEKIND_FLOAT:
+            if (OpcUaChangeFlagBuffer.UaFloat != NULL) {
+                OpcUaChangeFlagBuffer.UaFloat[message->index] = 1;
+            }
+            break;
+        case UA_DATATYPEKIND_DOUBLE:
+            if (OpcUaChangeFlagBuffer.UaDouble != NULL) {
+                OpcUaChangeFlagBuffer.UaDouble[message->index] = 1;
+            }
+            break;
+        case UA_DATATYPEKIND_STRING: {
+            if (OpcUaChangeFlagBuffer.UaString != NULL) {
+                OpcUaChangeFlagBuffer.UaString[message->index] = 1;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+
     return retval;
 }
 
@@ -82,8 +148,7 @@ static void GlobalDataChangeCallback(UA_Server *server, UA_UInt32 monitoredItemI
     variable_context_t *ctx = (variable_context_t *)monitoredItemContext;
 
     if (mqueue_opcua_to_codesys && registration_active == false) {
-        variable_write_t msg;
-        memset(&msg, 0, sizeof(msg));
+        variable_write_t msg = {0};
 
         msg.message_type = MSG_TYPE_WRITE_VARIABLE;
         msg.index = ctx->index;
@@ -91,39 +156,87 @@ static void GlobalDataChangeCallback(UA_Server *server, UA_UInt32 monitoredItemI
 
         switch(ctx->typeKind) {
             case UA_DATATYPEKIND_BOOLEAN:
+                if (OpcUaChangeFlagBuffer.UaBoolean[ctx->index]) {
+                    OpcUaChangeFlagBuffer.UaBoolean[ctx->index] = 0;
+                    return;
+                }
                 memcpy(msg.value, value->value.data, sizeof(UA_Boolean));
                 break;
             case UA_DATATYPEKIND_SBYTE:
+                if (OpcUaChangeFlagBuffer.UaSByte[ctx->index]) {
+                    OpcUaChangeFlagBuffer.UaSByte[ctx->index] = 0;
+                    return;
+                }
                 memcpy(msg.value, value->value.data, sizeof(UA_SByte));
                 break;
             case UA_DATATYPEKIND_BYTE:
+                if (OpcUaChangeFlagBuffer.UaByte[ctx->index]) {
+                    OpcUaChangeFlagBuffer.UaByte[ctx->index] = 0;
+                    return;
+                }
                 memcpy(msg.value, value->value.data, sizeof(UA_Byte));
                 break;
             case UA_DATATYPEKIND_INT16:
+                if (OpcUaChangeFlagBuffer.UaInt16[ctx->index]) {
+                    OpcUaChangeFlagBuffer.UaInt16[ctx->index] = 0;
+                    return;
+                }
                 memcpy(msg.value, value->value.data, sizeof(UA_Int16));
                 break;
             case UA_DATATYPEKIND_UINT16:
+                if (OpcUaChangeFlagBuffer.UaUint16[ctx->index]) {
+                    OpcUaChangeFlagBuffer.UaUint16[ctx->index] = 0;
+                    return;
+                }
                 memcpy(msg.value, value->value.data, sizeof(UA_UInt16));
                 break;
             case UA_DATATYPEKIND_INT32:
+                if (OpcUaChangeFlagBuffer.UaInt32[ctx->index]) {
+                    OpcUaChangeFlagBuffer.UaInt32[ctx->index] = 0;
+                    return;
+                }
                 memcpy(msg.value, value->value.data, sizeof(UA_Int32));
                 break;
             case UA_DATATYPEKIND_UINT32:
+                if (OpcUaChangeFlagBuffer.UaUint32[ctx->index]) {
+                    OpcUaChangeFlagBuffer.UaUint32[ctx->index] = 0;
+                    return;
+                }
                 memcpy(msg.value, value->value.data, sizeof(UA_UInt32));
                 break;
             case UA_DATATYPEKIND_INT64:
+                if (OpcUaChangeFlagBuffer.UaInt64[ctx->index]) {
+                    OpcUaChangeFlagBuffer.UaInt64[ctx->index] = 0;
+                    return;
+                }
                 memcpy(msg.value, value->value.data, sizeof(UA_Int64));
                 break;
             case UA_DATATYPEKIND_UINT64:
+                if (OpcUaChangeFlagBuffer.UaUint64[ctx->index]) {
+                    OpcUaChangeFlagBuffer.UaUint64[ctx->index] = 0;
+                    return;
+                }
                 memcpy(msg.value, value->value.data, sizeof(UA_UInt64));
                 break;
             case UA_DATATYPEKIND_FLOAT:
+                if (OpcUaChangeFlagBuffer.UaFloat[ctx->index]) {
+                    OpcUaChangeFlagBuffer.UaFloat[ctx->index] = 0;
+                    return;
+                }
                 memcpy(msg.value, value->value.data, sizeof(UA_Float));
                 break;
             case UA_DATATYPEKIND_DOUBLE:
+                if (OpcUaChangeFlagBuffer.UaDouble[ctx->index]) {
+                    OpcUaChangeFlagBuffer.UaDouble[ctx->index] = 0;
+                    return;
+                }
                 memcpy(msg.value, value->value.data, sizeof(UA_Double));
                 break;
             case UA_DATATYPEKIND_STRING: {
+                if (OpcUaChangeFlagBuffer.UaString[ctx->index]) {
+                    OpcUaChangeFlagBuffer.UaString[ctx->index] = 0;
+                    return;
+                }
                 UA_String *str = (UA_String*)value->value.data;
                 if (str->data && str->length > 0) {
                     size_t copy_len = (str->length < MAX_DATA_SIZE) ? str->length : MAX_DATA_SIZE - 1;
@@ -141,6 +254,19 @@ static void GlobalDataChangeCallback(UA_Server *server, UA_UInt32 monitoredItemI
     }
 }
 
+static void AllocateMemory(uint8_t *buffer, uint16_t NumberAcceptedParameters) {
+    if (buffer != NULL || NumberAcceptedParameters == 0) {
+        return;
+    }
+
+    size_t TotalSize = NumberAcceptedParameters;
+
+    buffer = calloc(1, TotalSize);
+    if (buffer == NULL) {
+        return;
+    }
+}
+
 static void AddVariableToOpcUaServer(char *buffer) {
     variable_registration_t *message = (variable_registration_t*)buffer;
 
@@ -150,6 +276,98 @@ static void AddVariableToOpcUaServer(char *buffer) {
     AccessLevel *pAccessLevel = &message->access_level;
     uint8_t *pValue = message->value;
     double deadbandValue = message->deadbandValue;
+    uint16_t NumberAcceptedParameters = message->NumberAcceptedParameters;
+
+    if (NumberAcceptedParameters > 0) {
+        switch (typeKind) {
+            case UA_DATATYPEKIND_BOOLEAN:
+                AllocateMemory(OpcUaChangeFlagBuffer.UaBoolean, NumberAcceptedParameters);
+                if (OpcUaChangeFlagBuffer.UaBoolean == NULL) {
+                    break;
+                }
+                OpcUaChangeFlagBuffer.UaBoolean[message->index] = 1;
+                break;
+            case UA_DATATYPEKIND_SBYTE:
+                AllocateMemory(OpcUaChangeFlagBuffer.UaSByte, NumberAcceptedParameters);
+                if (OpcUaChangeFlagBuffer.UaSByte == NULL) {
+                    break;
+                }
+                OpcUaChangeFlagBuffer.UaSByte[message->index] = 1;
+                break;
+            case UA_DATATYPEKIND_BYTE:
+                AllocateMemory(OpcUaChangeFlagBuffer.UaByte, NumberAcceptedParameters);
+                if (OpcUaChangeFlagBuffer.UaByte == NULL) {
+                    break;
+                }
+                OpcUaChangeFlagBuffer.UaByte[message->index] = 1;
+                break;
+            case UA_DATATYPEKIND_INT16:
+                AllocateMemory(OpcUaChangeFlagBuffer.UaInt16, NumberAcceptedParameters);
+                if (OpcUaChangeFlagBuffer.UaInt16 == NULL) {
+                    break;
+                }
+                OpcUaChangeFlagBuffer.UaInt16[message->index] = 1;
+                break;
+            case UA_DATATYPEKIND_UINT16:
+                AllocateMemory(OpcUaChangeFlagBuffer.UaUint16, NumberAcceptedParameters);
+                if (OpcUaChangeFlagBuffer.UaUint16 == NULL) {
+                    break;
+                }
+                OpcUaChangeFlagBuffer.UaUint16[message->index] = 1;
+                break;
+            case UA_DATATYPEKIND_INT32:
+                AllocateMemory(OpcUaChangeFlagBuffer.UaInt32, NumberAcceptedParameters);
+                if (OpcUaChangeFlagBuffer.UaInt32 == NULL) {
+                    break;
+                }
+                OpcUaChangeFlagBuffer.UaInt32[message->index] = 1;
+                break;
+            case UA_DATATYPEKIND_UINT32:
+                AllocateMemory(OpcUaChangeFlagBuffer.UaUint32, NumberAcceptedParameters);
+                if (OpcUaChangeFlagBuffer.UaUint32 == NULL) {
+                    break;
+                }
+                OpcUaChangeFlagBuffer.UaUint32[message->index] = 1;
+                break;
+            case UA_DATATYPEKIND_INT64:
+                AllocateMemory(OpcUaChangeFlagBuffer.UaInt64, NumberAcceptedParameters);
+                if (OpcUaChangeFlagBuffer.UaInt64 == NULL) {
+                    break;
+                }
+                OpcUaChangeFlagBuffer.UaInt64[message->index] = 1;
+                break;
+            case UA_DATATYPEKIND_UINT64:
+                AllocateMemory(OpcUaChangeFlagBuffer.UaUint64, NumberAcceptedParameters);
+                if (OpcUaChangeFlagBuffer.UaUint64 == NULL) {
+                    break;
+                }
+                OpcUaChangeFlagBuffer.UaUint64[message->index] = 1;
+                break;
+            case UA_DATATYPEKIND_FLOAT:
+                AllocateMemory(OpcUaChangeFlagBuffer.UaFloat, NumberAcceptedParameters);
+                if (OpcUaChangeFlagBuffer.UaFloat == NULL) {
+                    break;
+                }
+                OpcUaChangeFlagBuffer.UaFloat[message->index] = 1;
+                break;
+            case UA_DATATYPEKIND_DOUBLE:
+                AllocateMemory(OpcUaChangeFlagBuffer.UaDouble, NumberAcceptedParameters);
+                if (OpcUaChangeFlagBuffer.UaDouble == NULL) {
+                    break;
+                }
+                OpcUaChangeFlagBuffer.UaDouble[message->index] = 1;
+                break;
+            case UA_DATATYPEKIND_STRING:
+                AllocateMemory(OpcUaChangeFlagBuffer.UaString, NumberAcceptedParameters);
+                if (OpcUaChangeFlagBuffer.UaString == NULL) {
+                    break;
+                }
+                OpcUaChangeFlagBuffer.UaString[message->index] = 1;
+                break;
+            default:
+                break;
+        }
+    }
 
 #ifdef DEBUG
     printf("[OPC_UA] === AddVariableToOpcUaServer ===\n");
@@ -320,6 +538,28 @@ static void AddVariableToOpcUaServer(char *buffer) {
     }
 }
 
+static void FreeChangeFlagBufferStructs(uint8_t *ChangeFlagBuffer) {
+    if (ChangeFlagBuffer != NULL) {
+        free(ChangeFlagBuffer);
+        ChangeFlagBuffer = NULL;
+    }
+}
+
+static void FreeChangeFlagBuffer(void) {
+    FreeChangeFlagBufferStructs(OpcUaChangeFlagBuffer.UaBoolean);
+    FreeChangeFlagBufferStructs(OpcUaChangeFlagBuffer.UaSByte);
+    FreeChangeFlagBufferStructs(OpcUaChangeFlagBuffer.UaByte);
+    FreeChangeFlagBufferStructs(OpcUaChangeFlagBuffer.UaInt16);
+    FreeChangeFlagBufferStructs(OpcUaChangeFlagBuffer.UaUint16);
+    FreeChangeFlagBufferStructs(OpcUaChangeFlagBuffer.UaInt32);
+    FreeChangeFlagBufferStructs(OpcUaChangeFlagBuffer.UaUint32);
+    FreeChangeFlagBufferStructs(OpcUaChangeFlagBuffer.UaInt64);
+    FreeChangeFlagBufferStructs(OpcUaChangeFlagBuffer.UaUint64);
+    FreeChangeFlagBufferStructs(OpcUaChangeFlagBuffer.UaFloat);
+    FreeChangeFlagBufferStructs(OpcUaChangeFlagBuffer.UaDouble);
+    FreeChangeFlagBufferStructs(OpcUaChangeFlagBuffer.UaString);
+}
+
 static void IncomingPacketManager(uint8_t *buffer, ssize_t length) {
     message_type_t header = *(message_type_t*)buffer;
 
@@ -375,6 +615,9 @@ static void IncomingPacketManager(uint8_t *buffer, ssize_t length) {
             printf("[OPC_UA] MSG_TYPE_SHUT_DOWN\n");
             fflush(stdout);
 #endif
+
+            FreeChangeFlagBuffer();
+
             ThreadUnLock(&codesys_to_opcua_shutdown_mutex, &codesys_to_opcua_shutdown_cond, &codesys_to_opcua_shutdown);
             ThreadUnLock(&opcua_to_codesys_shutdown_mutex, &opcua_to_codesys_shutdown_cond, &opcua_to_codesys_shutdown);
             opcua_server_pthread_running = false;
@@ -592,6 +835,7 @@ static int InitializeSyncPrimitives(void) {
 }
 
 int main(int argc, char* argv[]) {
+    memset(&OpcUaChangeFlagBuffer, 0, sizeof(OpcUaChangeFlagBuffer));
 
     InitializeSyncPrimitives();
 
