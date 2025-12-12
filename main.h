@@ -108,7 +108,7 @@ typedef struct {
     uint8_t *UaString;
 } change_flag_buffer;
 
-change_flag_buffer OpcUaChangeFlagBuffer;
+change_flag_buffer OpcUaChangeFlagBuffer = {0};
 
 typedef struct {
     message_type_t message_type;

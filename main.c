@@ -254,7 +254,9 @@ static void GlobalDataChangeCallback(UA_Server *server, UA_UInt32 monitoredItemI
     }
 }
 
-static void AllocateMemory(uint8_t *buffer, uint16_t NumberAcceptedParameters) {
+static void AllocateMemory(uint8_t **pbuffer, uint16_t NumberAcceptedParameters) {
+    uint8_t *buffer = *pbuffer;
+
     if (buffer != NULL || NumberAcceptedParameters == 0) {
         return;
     }
@@ -262,9 +264,12 @@ static void AllocateMemory(uint8_t *buffer, uint16_t NumberAcceptedParameters) {
     size_t TotalSize = NumberAcceptedParameters;
 
     buffer = calloc(1, TotalSize);
-    if (buffer == NULL) {
+    if (buffer != NULL) {
+        *pbuffer = buffer;
         return;
     }
+
+    *pbuffer = NULL;
 }
 
 static void AddVariableToOpcUaServer(char *buffer) {
@@ -281,84 +286,84 @@ static void AddVariableToOpcUaServer(char *buffer) {
     if (NumberAcceptedParameters > 0) {
         switch (typeKind) {
             case UA_DATATYPEKIND_BOOLEAN:
-                AllocateMemory(OpcUaChangeFlagBuffer.UaBoolean, NumberAcceptedParameters);
+                AllocateMemory(&OpcUaChangeFlagBuffer.UaBoolean, NumberAcceptedParameters);
                 if (OpcUaChangeFlagBuffer.UaBoolean == NULL) {
                     break;
                 }
                 OpcUaChangeFlagBuffer.UaBoolean[message->index] = 1;
                 break;
             case UA_DATATYPEKIND_SBYTE:
-                AllocateMemory(OpcUaChangeFlagBuffer.UaSByte, NumberAcceptedParameters);
+                AllocateMemory(&OpcUaChangeFlagBuffer.UaSByte, NumberAcceptedParameters);
                 if (OpcUaChangeFlagBuffer.UaSByte == NULL) {
                     break;
                 }
                 OpcUaChangeFlagBuffer.UaSByte[message->index] = 1;
                 break;
             case UA_DATATYPEKIND_BYTE:
-                AllocateMemory(OpcUaChangeFlagBuffer.UaByte, NumberAcceptedParameters);
+                AllocateMemory(&OpcUaChangeFlagBuffer.UaByte, NumberAcceptedParameters);
                 if (OpcUaChangeFlagBuffer.UaByte == NULL) {
                     break;
                 }
                 OpcUaChangeFlagBuffer.UaByte[message->index] = 1;
                 break;
             case UA_DATATYPEKIND_INT16:
-                AllocateMemory(OpcUaChangeFlagBuffer.UaInt16, NumberAcceptedParameters);
+                AllocateMemory(&OpcUaChangeFlagBuffer.UaInt16, NumberAcceptedParameters);
                 if (OpcUaChangeFlagBuffer.UaInt16 == NULL) {
                     break;
                 }
                 OpcUaChangeFlagBuffer.UaInt16[message->index] = 1;
                 break;
             case UA_DATATYPEKIND_UINT16:
-                AllocateMemory(OpcUaChangeFlagBuffer.UaUint16, NumberAcceptedParameters);
+                AllocateMemory(&OpcUaChangeFlagBuffer.UaUint16, NumberAcceptedParameters);
                 if (OpcUaChangeFlagBuffer.UaUint16 == NULL) {
                     break;
                 }
                 OpcUaChangeFlagBuffer.UaUint16[message->index] = 1;
                 break;
             case UA_DATATYPEKIND_INT32:
-                AllocateMemory(OpcUaChangeFlagBuffer.UaInt32, NumberAcceptedParameters);
+                AllocateMemory(&OpcUaChangeFlagBuffer.UaInt32, NumberAcceptedParameters);
                 if (OpcUaChangeFlagBuffer.UaInt32 == NULL) {
                     break;
                 }
                 OpcUaChangeFlagBuffer.UaInt32[message->index] = 1;
                 break;
             case UA_DATATYPEKIND_UINT32:
-                AllocateMemory(OpcUaChangeFlagBuffer.UaUint32, NumberAcceptedParameters);
+                AllocateMemory(&OpcUaChangeFlagBuffer.UaUint32, NumberAcceptedParameters);
                 if (OpcUaChangeFlagBuffer.UaUint32 == NULL) {
                     break;
                 }
                 OpcUaChangeFlagBuffer.UaUint32[message->index] = 1;
                 break;
             case UA_DATATYPEKIND_INT64:
-                AllocateMemory(OpcUaChangeFlagBuffer.UaInt64, NumberAcceptedParameters);
+                AllocateMemory(&OpcUaChangeFlagBuffer.UaInt64, NumberAcceptedParameters);
                 if (OpcUaChangeFlagBuffer.UaInt64 == NULL) {
                     break;
                 }
                 OpcUaChangeFlagBuffer.UaInt64[message->index] = 1;
                 break;
             case UA_DATATYPEKIND_UINT64:
-                AllocateMemory(OpcUaChangeFlagBuffer.UaUint64, NumberAcceptedParameters);
+                AllocateMemory(&OpcUaChangeFlagBuffer.UaUint64, NumberAcceptedParameters);
                 if (OpcUaChangeFlagBuffer.UaUint64 == NULL) {
                     break;
                 }
                 OpcUaChangeFlagBuffer.UaUint64[message->index] = 1;
                 break;
             case UA_DATATYPEKIND_FLOAT:
-                AllocateMemory(OpcUaChangeFlagBuffer.UaFloat, NumberAcceptedParameters);
+                AllocateMemory(&OpcUaChangeFlagBuffer.UaFloat, NumberAcceptedParameters);
                 if (OpcUaChangeFlagBuffer.UaFloat == NULL) {
                     break;
                 }
                 OpcUaChangeFlagBuffer.UaFloat[message->index] = 1;
                 break;
             case UA_DATATYPEKIND_DOUBLE:
-                AllocateMemory(OpcUaChangeFlagBuffer.UaDouble, NumberAcceptedParameters);
+                AllocateMemory(&OpcUaChangeFlagBuffer.UaDouble, NumberAcceptedParameters);
                 if (OpcUaChangeFlagBuffer.UaDouble == NULL) {
                     break;
                 }
                 OpcUaChangeFlagBuffer.UaDouble[message->index] = 1;
                 break;
             case UA_DATATYPEKIND_STRING:
-                AllocateMemory(OpcUaChangeFlagBuffer.UaString, NumberAcceptedParameters);
+                AllocateMemory(&OpcUaChangeFlagBuffer.UaString, NumberAcceptedParameters);
                 if (OpcUaChangeFlagBuffer.UaString == NULL) {
                     break;
                 }
@@ -538,26 +543,26 @@ static void AddVariableToOpcUaServer(char *buffer) {
     }
 }
 
-static void FreeChangeFlagBufferStructs(uint8_t *ChangeFlagBuffer) {
-    if (ChangeFlagBuffer != NULL) {
-        free(ChangeFlagBuffer);
-        ChangeFlagBuffer = NULL;
+static void FreeChangeFlagBufferStructs(uint8_t **buffer_ptr) {
+    if (*buffer_ptr != NULL) {
+        free(*buffer_ptr);
+        *buffer_ptr = NULL;
     }
 }
 
 static void FreeChangeFlagBuffer(void) {
-    FreeChangeFlagBufferStructs(OpcUaChangeFlagBuffer.UaBoolean);
-    FreeChangeFlagBufferStructs(OpcUaChangeFlagBuffer.UaSByte);
-    FreeChangeFlagBufferStructs(OpcUaChangeFlagBuffer.UaByte);
-    FreeChangeFlagBufferStructs(OpcUaChangeFlagBuffer.UaInt16);
-    FreeChangeFlagBufferStructs(OpcUaChangeFlagBuffer.UaUint16);
-    FreeChangeFlagBufferStructs(OpcUaChangeFlagBuffer.UaInt32);
-    FreeChangeFlagBufferStructs(OpcUaChangeFlagBuffer.UaUint32);
-    FreeChangeFlagBufferStructs(OpcUaChangeFlagBuffer.UaInt64);
-    FreeChangeFlagBufferStructs(OpcUaChangeFlagBuffer.UaUint64);
-    FreeChangeFlagBufferStructs(OpcUaChangeFlagBuffer.UaFloat);
-    FreeChangeFlagBufferStructs(OpcUaChangeFlagBuffer.UaDouble);
-    FreeChangeFlagBufferStructs(OpcUaChangeFlagBuffer.UaString);
+    FreeChangeFlagBufferStructs(&OpcUaChangeFlagBuffer.UaBoolean);
+    FreeChangeFlagBufferStructs(&OpcUaChangeFlagBuffer.UaSByte);
+    FreeChangeFlagBufferStructs(&OpcUaChangeFlagBuffer.UaByte);
+    FreeChangeFlagBufferStructs(&OpcUaChangeFlagBuffer.UaInt16);
+    FreeChangeFlagBufferStructs(&OpcUaChangeFlagBuffer.UaUint16);
+    FreeChangeFlagBufferStructs(&OpcUaChangeFlagBuffer.UaInt32);
+    FreeChangeFlagBufferStructs(&OpcUaChangeFlagBuffer.UaUint32);
+    FreeChangeFlagBufferStructs(&OpcUaChangeFlagBuffer.UaInt64);
+    FreeChangeFlagBufferStructs(&OpcUaChangeFlagBuffer.UaUint64);
+    FreeChangeFlagBufferStructs(&OpcUaChangeFlagBuffer.UaFloat);
+    FreeChangeFlagBufferStructs(&OpcUaChangeFlagBuffer.UaDouble);
+    FreeChangeFlagBufferStructs(&OpcUaChangeFlagBuffer.UaString);
 }
 
 static void IncomingPacketManager(uint8_t *buffer, ssize_t length) {
