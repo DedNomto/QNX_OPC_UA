@@ -21,7 +21,7 @@
 
 #define QUEUE_NAME_CODESYS_TO_OPCUA "/codesys_to_opcua"
 #define QUEUE_NAME_OPCUA_TO_CODESYS "/opcua_to_codesys"
-#define MAX_MSG_SIZE 128 * 1024
+#define MAX_MSG_SIZE 1024
 
 static int mqueue_codesys_to_opcua = -1;
 static int mqueue_opcua_to_codesys = -1;
